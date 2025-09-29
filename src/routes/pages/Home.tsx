@@ -2,19 +2,19 @@ export function Home() {
   return (
     <main className="mx-auto max-w-2xl p-8">
       <div className="bg-card outline-border dark:bg-card dark:outline-border/10 animate-fade-in mb-8 rounded-xl p-6 shadow-lg outline dark:shadow-none dark:-outline-offset-1">
-        <h1 className="text-primary mb-4 text-center text-4xl font-bold">
+        <h1 className="mb-4 text-center text-4xl font-bold">
           미스터 대박 디너 서비스
         </h1>
         <p className="text-muted-foreground mb-6 text-center text-lg">
           특별한 날, 집에서 편안하게 최고의 만찬을!
           <br />
-          <span className="text-accent font-semibold">
+          <span className="text-accent-foreground font-semibold">
             “당신의 남편, 아내, 엄마, 아버지 또는 친구를 감동시켜라”
           </span>
         </p>
       </div>
       <section className="mb-8">
-        <h2 className="text-secondary mb-2 text-xl font-semibold">
+        <h2 className="text-secondary-foreground mb-2 text-xl font-semibold">
           주요 디너 메뉴
         </h2>
         <ul className="grid gap-4 sm:grid-cols-2">
@@ -41,22 +41,22 @@ export function Home() {
         </ul>
       </section>
       <section className="mb-8">
-        <h2 className="text-secondary mb-2 text-xl font-semibold">
+        <h2 className="text-secondary-foreground mb-2 text-xl font-semibold">
           서빙 스타일
         </h2>
         <ul className="grid gap-4 sm:grid-cols-3">
           <li className="bg-muted border-border rounded-lg border p-4">
-            <span className="text-primary font-bold">심플(Simple)</span>
+            <span className="font-bold">심플(Simple)</span>
             <br />
             플라스틱 접시/컵, 종이 냅킨, 플라스틱 쟁반
           </li>
           <li className="bg-muted border-border rounded-lg border p-4">
-            <span className="text-primary font-bold">그랜드(Grand)</span>
+            <span className="font-bold">그랜드(Grand)</span>
             <br />
             도자기 접시/컵, 면 냅킨, 나무 쟁반
           </li>
           <li className="bg-muted border-border rounded-lg border p-4">
-            <span className="text-primary font-bold">디럭스(Deluxe)</span>
+            <span className="font-bold">디럭스(Deluxe)</span>
             <br />
             꽃병, 도자기 접시/컵, 린넨 냅킨, 나무 쟁반
           </li>
@@ -66,7 +66,9 @@ export function Home() {
         </p>
       </section>
       <section className="mb-8">
-        <h2 className="text-secondary mb-2 text-xl font-semibold">주문 안내</h2>
+        <h2 className="text-secondary-foreground mb-2 text-xl font-semibold">
+          주문 안내
+        </h2>
         <ul className="text-foreground list-disc space-y-1 pl-5">
           <li>회원가입 후 로그인하면 주문 가능</li>
           <li>웹/앱/음성인식으로 주문 지원</li>
@@ -75,7 +77,9 @@ export function Home() {
         </ul>
       </section>
       <section className="mb-8">
-        <h2 className="text-secondary mb-2 text-xl font-semibold">회원 혜택</h2>
+        <h2 className="text-secondary-foreground mb-2 text-xl font-semibold">
+          회원 혜택
+        </h2>
         <ul className="text-foreground list-disc space-y-1 pl-5">
           <li>단골 고객 할인 제공</li>
           <li>주문 시 주소, 연락처 등 자동 입력</li>
