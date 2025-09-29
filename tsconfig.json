@@ -5,9 +5,11 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
-    "baseUrl": ".",	   // 절대 경로의 기준을 프로젝트 루트로 설정
+    "baseUrl": ".", // 절대 경로의 기준을 프로젝트 루트로 설정
     "paths": {
-      "@/*": ["src/*"] // '@'를 'src' 폴더로 매핑
+      "@/*": ["src/*"], // '@'를 'src' 폴더로 매핑
+      "@pages/*": ["src/routes/pages/*"],
+      "@ui/*": ["src/components/ui/*"]
     }
   }
 }
