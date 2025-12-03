@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 
 import { getCatalogAPI } from '@/api/catalog/bootstrap.api';
 import { getDinnerAPI } from '@/api/catalog/dinner.api';
+import { ChatbotOrder } from '@/components/catalog/ChatbotOrder';
 import { DinnerModal } from '@/components/catalog/DinnerModal';
 import { LogInOutBtn } from '@/components/LogInOutBtn';
 import { CatalogResponse, DinnerDetail } from '@/types/dinner';
@@ -168,6 +169,9 @@ export function Catalog() {
           onClose={() => setSelectedDinner(null)}
         />
       )}
+
+      {/* 챗봇 주문 */}
+      <ChatbotOrder />
     </div>
   );
 }
