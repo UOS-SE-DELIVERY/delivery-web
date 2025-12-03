@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <!-- Background gradient circle -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#EE5A6F;stop-opacity:1" />
+    </linearGradient>
+    <radialGradient id="plateGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F8F9FA;stop-opacity:1" />
+    </radialGradient>
+  </defs>
+  
+  <!-- Background circle with gradient -->
+  <circle cx="64" cy="64" r="64" fill="url(#bgGrad)"/>
+  
+  <!-- Shadow -->
+  <ellipse cx="64" cy="75" rx="45" ry="8" fill="#000" opacity="0.15"/>
+  
+  <!-- Plate with gradient -->
+  <ellipse cx="64" cy="72" rx="45" ry="8" fill="url(#plateGrad)"/>
+  
+  <!-- Fork (left) - silver color -->
+  <g transform="translate(35, 45)">
+    <rect x="8" y="0" width="3" height="35" rx="1.5" fill="#8B95A5"/>
+    <rect x="4" y="0" width="2" height="12" rx="1" fill="#8B95A5"/>
+    <rect x="7" y="0" width="2" height="12" rx="1" fill="#8B95A5"/>
+    <rect x="10" y="0" width="2" height="12" rx="1" fill="#8B95A5"/>
+    <rect x="13" y="0" width="2" height="12" rx="1" fill="#8B95A5"/>
+    <!-- Highlight -->
+    <rect x="9" y="2" width="1" height="25" fill="#C1C9D5" opacity="0.6"/>
+  </g>
+  
+  <!-- Knife (right) - silver color -->
+  <g transform="translate(75, 45)">
+    <rect x="8" y="0" width="3" height="35" rx="1.5" fill="#8B95A5"/>
+    <path d="M 7 0 L 7 15 L 12 10 L 12 0 Z" fill="#B5BCC9"/>
+    <rect x="7" y="0" width="5" height="2" rx="1" fill="#6C7580"/>
+    <!-- Highlight on blade -->
+    <path d="M 8 2 L 8 12 L 11 9 L 11 2 Z" fill="#D4D9E1" opacity="0.5"/>
+  </g>
+  
+  <!-- Sparkles - golden -->
+  <g opacity="0.95">
+    <circle cx="28" cy="35" r="2.5" fill="#FFD93D"/>
+    <circle cx="100" cy="35" r="2.5" fill="#FFD93D"/>
+    <circle cx="35" cy="85" r="2" fill="#FFC837"/>
+    <circle cx="93" cy="85" r="2" fill="#FFC837"/>
+    <!-- Extra small sparkles -->
+    <circle cx="50" cy="30" r="1.5" fill="#FFED4E" opacity="0.8"/>
+    <circle cx="78" cy="30" r="1.5" fill="#FFED4E" opacity="0.8"/>
+  </g>
+  
+  <!-- Heart accent - vibrant red -->
+  <path d="M 64 32 L 66 30 C 68 28 71 28 73 30 C 75 32 75 35 73 37 L 64 46 L 55 37 C 53 35 53 32 55 30 C 57 28 60 28 62 30 Z" fill="#FF4757"/>
+  <!-- Heart highlight -->
+  <ellipse cx="61" cy="32" rx="2" ry="1.5" fill="#FF6B7A" opacity="0.7"/>
+</svg>
