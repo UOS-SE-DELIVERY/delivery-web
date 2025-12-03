@@ -107,21 +107,18 @@ export function DeliveryForm({
         <div>
           <div className="mb-1 flex items-center justify-between">
             <label className="text-sm font-medium">배송지</label>
-            {userProfile?.profile_consent && (
-              <button
-                type="button"
-                onClick={() => setIsAddressModalOpen(true)}
-                className="text-primary hover:text-primary/80 text-xs"
-              >
-                배송지 변경
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => setIsAddressModalOpen(true)}
+              className="text-primary hover:text-primary/80 text-xs"
+            >
+              주소 선택/변경
+            </button>
           </div>
           <input
             type="text"
             placeholder="주소를 입력하세요"
             className="w-full rounded border px-3 py-2 text-sm"
-            disabled={userProfile?.profile_consent}
             {...register('deliveryAddress', {
               required: '주소를 입력해주세요.',
             })}
@@ -131,67 +128,58 @@ export function DeliveryForm({
               {errors.deliveryAddress.message}
             </p>
           )}
-          {userProfile?.profile_consent && selectedAddressIdx !== null && (
-            <p className="text-muted-foreground mt-1 text-xs">
-              배송지 이름: {placeLabel}
-            </p>
-          )}
+          {/* 선택된 라벨/좌표 요약 메시지 제거 */}
+          <div className="mt-3">
+            <label className="mb-1 block text-sm font-medium">장소 라벨</label>
+            <input
+              type="text"
+              placeholder="집, 회사 등"
+              className="w-full rounded border px-3 py-2 text-sm"
+              {...register('placeLabel')}
+            />
+          </div>
         </div>
 
-        {!userProfile?.profile_consent && (
-          <>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="mb-1 block text-sm font-medium">위도</label>
-                <input
-                  type="number"
-                  step="0.000001"
-                  placeholder="37.566"
-                  className="w-full rounded border px-3 py-2 text-sm"
-                  {...register('geoLat', {
-                    valueAsNumber: true,
-                    validate: v => !Number.isNaN(v) || '위도를 입력해주세요.',
-                  })}
-                />
-                {errors.geoLat && (
-                  <p className="mt-1 text-xs text-red-600">
-                    {errors.geoLat.message as string}
-                  </p>
-                )}
-              </div>
-              <div>
-                <label className="mb-1 block text-sm font-medium">경도</label>
-                <input
-                  type="number"
-                  step="0.000001"
-                  placeholder="126.978"
-                  className="w-full rounded border px-3 py-2 text-sm"
-                  {...register('geoLng', {
-                    valueAsNumber: true,
-                    validate: v => !Number.isNaN(v) || '경도를 입력해주세요.',
-                  })}
-                />
-                {errors.geoLng && (
-                  <p className="mt-1 text-xs text-red-600">
-                    {errors.geoLng.message as string}
-                  </p>
-                )}
-              </div>
-            </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="mb-1 block text-sm font-medium">위도</label>
+            <input
+              type="number"
+              step="0.000001"
+              placeholder="37.566"
+              className="w-full rounded border px-3 py-2 text-sm"
+              {...register('geoLat', {
+                valueAsNumber: true,
+                validate: v => !Number.isNaN(v) || '위도를 입력해주세요.',
+              })}
+            />
+            {errors.geoLat && (
+              <p className="mt-1 text-xs text-red-600">
+                {errors.geoLat.message as string}
+              </p>
+            )}
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium">경도</label>
+            <input
+              type="number"
+              step="0.000001"
+              placeholder="126.978"
+              className="w-full rounded border px-3 py-2 text-sm"
+              {...register('geoLng', {
+                valueAsNumber: true,
+                validate: v => !Number.isNaN(v) || '경도를 입력해주세요.',
+              })}
+            />
+            {errors.geoLng && (
+              <p className="mt-1 text-xs text-red-600">
+                {errors.geoLng.message as string}
+              </p>
+            )}
+          </div>
+        </div>
 
-            <div>
-              <label className="mb-1 block text-sm font-medium">
-                장소 라벨
-              </label>
-              <input
-                type="text"
-                placeholder="집, 회사 등"
-                className="w-full rounded border px-3 py-2 text-sm"
-                {...register('placeLabel')}
-              />
-            </div>
-          </>
-        )}
+        {/* 장소 라벨 입력은 배송지 아래로 이동 */}
 
         <div>
           <label className="mb-1 block text-sm font-medium">
