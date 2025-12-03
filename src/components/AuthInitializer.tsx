@@ -1,9 +1,10 @@
 import { ReactNode, useEffect } from 'react';
+import { Outlet, ScrollRestoration } from 'react-router';
 
 import { getAuthMeAPI } from '@/api/auth/me/me.api';
 import { useAuthStore } from '@/store/authStore';
 
-export function AuthInitializer({ children }: { children: ReactNode }) {
+export function AuthInitializer() {
   const storeLogin = useAuthStore(state => state.storeLogin);
   const storeLogout = useAuthStore(state => state.storeLogout);
 
@@ -33,5 +34,10 @@ export function AuthInitializer({ children }: { children: ReactNode }) {
     };
   }, [storeLogin, storeLogout]);
 
-  return <>{children}</>;
+  return (
+    <>
+      <Outlet />
+      <ScrollRestoration />
+    </>
+  );
 }

@@ -6,43 +6,73 @@ import { Login } from '@pages/Login';
 import { MyOrder } from '@pages/MyOrder';
 import { Order } from '@pages/Order';
 import { Profile } from '@pages/Profile';
+import { Home as StaffHome } from '@pages/staff/Home';
+import { Inventory } from '@pages/staff/Inventory';
+import { Login as StaffLogin } from '@pages/staff/Login';
 import { createBrowserRouter, RouterProvider } from 'react-router';
+
+import { AuthInitializer } from '@/components/AuthInitializer';
+import { AuthInitializer as StaffAuthInitializer } from '@/components/staff/AuthInitializer';
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Home />,
-  },
-  {
-    path: 'join',
-    element: <Join />,
-  },
-  {
-    path: 'login',
-    element: <Login />,
-  },
-  {
-    path: 'catalog',
-    element: <Catalog />,
-  },
-  {
-    path: 'cart',
-    element: <Cart />,
-  },
-  {
-    path: 'profile',
-    element: <Profile />,
-  },
-  {
-    path: 'orders',
+    Component: AuthInitializer,
     children: [
       {
-        index: true, // /orders
-        element: <Order />,
+        index: true,
+        Component: Home,
       },
       {
-        path: 'me', // /orders/me
-        element: <MyOrder />,
+        path: 'join',
+        Component: Join,
+      },
+      {
+        path: 'login',
+        Component: Login,
+      },
+      {
+        path: 'catalog',
+        Component: Catalog,
+      },
+      {
+        path: 'cart',
+        Component: Cart,
+      },
+      {
+        path: 'profile',
+        Component: Profile,
+      },
+      {
+        path: 'orders',
+        children: [
+          {
+            index: true, // /orders
+            Component: Order,
+          },
+          {
+            path: 'me', // /orders/me
+            Component: MyOrder,
+          },
+        ],
+      },
+      {
+        path: 'staff',
+        Component: StaffAuthInitializer,
+        children: [
+          {
+            index: true,
+            Component: StaffHome,
+          },
+          {
+            path: 'login',
+            Component: StaffLogin,
+          },
+          {
+            path: 'inventory',
+            Component: Inventory,
+          },
+        ],
       },
     ],
   },
