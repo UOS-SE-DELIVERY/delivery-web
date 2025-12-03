@@ -6,10 +6,13 @@ import { useNavigate } from 'react-router';
 import { getAuthMeAPI } from '@/api/auth/me/me.api';
 import { getOrdersAPI } from '@/api/order/order.api';
 import { useAuthStore } from '@/store/authStore';
-import type {
-  OrderDinnerOption,
-  OrderItemOption,
-  OrderResponse,
+import {
+  getOrderStatusBadgeClass,
+  getOrderStatusLabel,
+  type OrderDinnerOption,
+  type OrderItemOption,
+  type OrderResponse,
+  type OrderStatus,
 } from '@/types/order';
 import type { Profile } from '@/types/profile';
 
@@ -85,36 +88,10 @@ export function MyOrder() {
     return Number.isFinite(num) ? Math.round(num).toString() : str;
   };
 
-  const statusLabel = (status: string) => {
-    const map: Record<string, string> = {
-      pending: '대기',
-      confirmed: '확정',
-      preparing: '준비중',
-      delivering: '배달중',
-      delivered: '완료',
-      cancelled: '취소',
-    };
-    return map[status] ?? status;
-  };
-
-  const statusBadgeClass = (status: string) => {
+  const statusBadgeClass = (status: OrderStatus) => {
     const base =
       'inline-flex items-center rounded px-2 py-0.5 text-xs font-medium';
-    switch (status) {
-      case 'pending':
-        return `${base} bg-gray-100 text-gray-700`;
-      case 'confirmed':
-      case 'preparing':
-        return `${base} bg-amber-100 text-amber-800`;
-      case 'delivering':
-        return `${base} bg-blue-100 text-blue-700`;
-      case 'delivered':
-        return `${base} bg-green-100 text-green-700`;
-      case 'cancelled':
-        return `${base} bg-red-100 text-red-700`;
-      default:
-        return `${base} bg-gray-100 text-gray-700`;
-    }
+    return `${base} ${getOrderStatusBadgeClass(status)}`;
   };
 
   const toggleExpand = (orderId: number) => {
@@ -127,7 +104,7 @@ export function MyOrder() {
   };
 
   const uniqueStatuses = useMemo(() => {
-    const set = new Set<string>();
+    const set = new Set<OrderStatus>();
     for (const o of orders) set.add(o.status);
     return Array.from(set);
   }, [orders]);
@@ -172,7 +149,7 @@ export function MyOrder() {
                 <option value="all">전체</option>
                 {uniqueStatuses.map(s => (
                   <option key={s} value={s}>
-                    {statusLabel(s)}
+                    {getOrderStatusLabel(s)}
                   </option>
                 ))}
               </select>
@@ -256,7 +233,7 @@ export function MyOrder() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className={statusBadgeClass(order.status)}>
-                            {statusLabel(order.status)}
+                            {getOrderStatusLabel(order.status)}
                           </span>
                           <span className="text-sm text-gray-500">
                             {formatDateTime(order.ordered_at)}
