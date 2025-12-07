@@ -1,92 +1,25 @@
 /* eslint-disable simple-import-sort/imports */
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
-import { getAuthMeAPI } from '@/api/auth/me/me.api';
-import { getOrdersAPI } from '@/api/order/order.api';
 import { useAuthStore } from '@/store/authStore';
+import { useOrders } from '@/hooks/order/useOrders';
 import {
   getOrderStatusBadgeClass,
   getOrderStatusLabel,
   type OrderDinnerOption,
   type OrderItemOption,
-  type OrderResponse,
   type OrderStatus,
 } from '@/types/order';
-import type { Profile } from '@/types/profile';
+import { formatCurrency, formatDateTime, asInt } from '@/utils/format';
 
 export function MyOrder() {
   const navigate = useNavigate();
   const isLogin = useAuthStore(s => s.isLogin);
-  const [orders, setOrders] = useState<OrderResponse[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const { orders, loading, error } = useOrders();
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
   const [statusFilter, setStatusFilter] = useState<string>('all');
-
-  useEffect(() => {
-    if (!isLogin) {
-      // 로그인 상태가 아니면 API 호출을 건너뜀
-      setOrders([]);
-      setLoading(false);
-      setError(null);
-      return;
-    }
-    let isMounted = true;
-    const load = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // 1) 내 프로필에서 customer_id 가져오기
-        const meRes = await getAuthMeAPI();
-        const me = meRes.data as Profile;
-        // 2) 내 주문 목록 조회 (최신순은 서버 정렬 가정)
-        const ordersRes = await getOrdersAPI(me.customer_id);
-        const data = ordersRes.data as OrderResponse[];
-        if (!isMounted) return;
-        setOrders(data);
-      } catch (e: unknown) {
-        if (!isMounted) return;
-        type HttpErrorLike = { response?: { status?: number } };
-        const status = (e as HttpErrorLike)?.response?.status;
-        if (status === 401) {
-          setError('로그인 후 주문 내역을 확인할 수 있습니다.');
-        } else {
-          setError('주문 목록을 불러오는 중 오류가 발생했습니다.');
-        }
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-    load();
-    return () => {
-      isMounted = false;
-    };
-  }, [isLogin]);
-
-  const formatCurrency = (amount: number) =>
-    amount.toLocaleString('ko-KR') + '원';
-
-  const formatDateTime = (iso: string) => {
-    try {
-      return new Date(iso).toLocaleString('ko-KR', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-      });
-    } catch {
-      return iso;
-    }
-  };
-
-  // 수량 문자열이 '1.00' 같은 형태로 올 때 정수로 깔끔하게 표시
-  const asInt = (val: string | number) => {
-    const str = String(val);
-    // 정수 또는 .0, .00 으로만 끝나는 경우 소수부 제거
-    if (/^-?\d+(?:\.0+)?$/.test(str)) return str.replace(/\.0+$/, '');
-    const num = Number(val);
-    return Number.isFinite(num) ? Math.round(num).toString() : str;
-  };
 
   const statusBadgeClass = (status: OrderStatus) => {
     const base =
@@ -155,13 +88,13 @@ export function MyOrder() {
               </select>
             </>
           )}
-          {/* 상단 오른쪽 뒤로가기 버튼 (Profile과 통일) */}
+          {/* 상단 오른쪽 카탈로그 버튼 */}
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/catalog')}
             className="rounded border px-4 py-2 hover:bg-gray-50"
           >
-            이전 페이지로
+            카탈로그로
           </button>
         </div>
       </div>
@@ -369,8 +302,9 @@ export function MyOrder() {
                                                 • {it.item_name}
                                               </div>
                                               <div className="mt-0.5 text-xs text-gray-600">
-                                                {asInt(it.final_qty)} ×{' '}
-                                                {formatCurrency(unitPrice)}
+                                                수량 {asInt(it.final_qty)}
+                                                {unitPrice !== 0 &&
+                                                  ` × ${formatCurrency(unitPrice)}`}
                                               </div>
                                             </div>
                                             <div className="shrink-0 text-right font-medium text-gray-800">
@@ -423,14 +357,14 @@ export function MyOrder() {
               })}
             </ul>
           )}
-          {/* 하단 왼쪽 뒤로가기 버튼 (Profile과 통일) */}
+          {/* 하단 왼쪽 카탈로그 버튼 */}
           <div className="mt-8">
             <button
               type="button"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/catalog')}
               className="rounded border px-4 py-2 hover:bg-gray-50"
             >
-              이전 페이지로
+              카탈로그로
             </button>
           </div>
         </>
