@@ -14,7 +14,7 @@ interface Tag {
   name: string;
 }
 
-interface CatalogDinner {
+export interface CatalogDinner {
   dinner_type_id: number;
   code: string;
   name: string;
