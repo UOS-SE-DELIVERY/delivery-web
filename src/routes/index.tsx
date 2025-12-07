@@ -6,6 +6,7 @@ import { Login } from '@pages/Login';
 import { MyOrder } from '@pages/MyOrder';
 import { Order } from '@pages/Order';
 import { Profile } from '@pages/Profile';
+import { Coupon } from '@pages/staff/Coupon';
 import { Home as StaffHome } from '@pages/staff/Home';
 import { Inventory } from '@pages/staff/Inventory';
 import { Login as StaffLogin } from '@pages/staff/Login';
@@ -71,6 +72,10 @@ const router = createBrowserRouter([
           {
             path: 'inventory',
             Component: Inventory,
+          },
+          {
+            path: 'coupons',
+            Component: Coupon,
           },
         ],
       },
