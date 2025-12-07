@@ -1,4 +1,4 @@
-import { Package, ShoppingBag } from 'lucide-react';
+import { Package, ShoppingBag, Ticket } from 'lucide-react';
 import { NavLink } from 'react-router';
 
 export function StaffHeader() {
@@ -38,6 +38,20 @@ export function StaffHeader() {
           >
             <ShoppingBag className="h-4 w-4" />
             재고 관리
+          </NavLink>
+
+          <NavLink
+            to="/staff/coupons"
+            className={({ isActive }) =>
+              `inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
+                isActive
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`
+            }
+          >
+            <Ticket className="h-4 w-4" />
+            쿠폰 관리
           </NavLink>
         </nav>
       </div>
