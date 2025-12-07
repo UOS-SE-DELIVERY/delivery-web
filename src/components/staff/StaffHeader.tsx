@@ -1,6 +1,8 @@
 import { Package, ShoppingBag, Ticket } from 'lucide-react';
 import { NavLink } from 'react-router';
 
+import { LogInOutBtn } from '@/components/staff/LogInOutBtn';
+
 export function StaffHeader() {
   return (
     <header className="bg-card border-border sticky top-0 z-50 border-b shadow-sm">
@@ -10,7 +12,7 @@ export function StaffHeader() {
           <h1 className="text-foreground text-xl font-bold">Staff Dashboard</h1>
         </div>
 
-        <nav className="flex items-center gap-2">
+        <nav className="flex items-center gap-4">
           <NavLink
             to="/staff"
             end
@@ -53,6 +55,8 @@ export function StaffHeader() {
             <Ticket className="h-4 w-4" />
             쿠폰 관리
           </NavLink>
+
+          <LogInOutBtn />
         </nav>
       </div>
     </header>
