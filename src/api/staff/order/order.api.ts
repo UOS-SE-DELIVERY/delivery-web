@@ -38,9 +38,10 @@ export interface StaffOrderItemOption {
 
 export interface StaffOrderItem {
   id: number;
+  item_code: string;
   item: {
     id: number;
-    name: string;
+    name: string | null;
   };
   final_qty: string;
   unit_price_cents: number;
