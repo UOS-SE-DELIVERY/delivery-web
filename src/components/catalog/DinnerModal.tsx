@@ -476,12 +476,28 @@ export function DinnerModal({ dinner, onClose }: DinnerModalProps) {
                         )}
                       </div>
                     </div>
-                    {style.price_value !== 0 && (
-                      <span className="text-primary">
-                        {style.price_mode === 'delta' ? '+' : ''}
-                        {formatCurrency(style.price_value)}
-                      </span>
-                    )}
+                    {style.price_value !== 0 &&
+                      style.price_mode === 'delta' && (
+                        <span className="text-primary">
+                          +{formatCurrency(style.price_value)}
+                        </span>
+                      )}
+                    {style.price_mode === 'multiplier' &&
+                      style.price_value !== 1 && (
+                        <span className="text-primary">
+                          {Math.floor(
+                            dinner.dinner.base_price_cents * style.price_value,
+                          ) > dinner.dinner.base_price_cents
+                            ? '+'
+                            : ''}
+                          {formatCurrency(
+                            Math.floor(
+                              dinner.dinner.base_price_cents *
+                                style.price_value,
+                            ) - dinner.dinner.base_price_cents,
+                          )}
+                        </span>
+                      )}
                   </div>
                 ))}
               </div>
