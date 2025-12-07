@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { useAuthStore } from '@/store/authStore';
 import useCartStore from '@/store/cartStore';
+import { formatCurrency } from '@/utils/format';
 import { calculateDinnerPrice } from '@/utils/orderPrice';
 
 export function Cart() {
@@ -12,14 +14,53 @@ export function Cart() {
   const clearCart = useCartStore(state => state.clearCart);
   const isLogin = useAuthStore(state => state.isLogin);
 
-  const handleOrder = (entry: (typeof entries)[0]) => {
-    if (!isLogin) {
-      alert('로그인이 필요합니다.');
-      navigate('/login', { state: { redirectTo: '/orders', entry } });
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const handleToggleSelect = (entryId: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(entryId)) {
+        next.delete(entryId);
+      } else {
+        next.add(entryId);
+      }
+      return next;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === entries.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(entries.map(e => e.id)));
+    }
+  };
+
+  const handleOrder = () => {
+    if (selectedIds.size === 0) {
+      alert('주문할 항목을 선택해주세요.');
       return;
     }
-    navigate('/orders', { state: { entry } });
+
+    if (!isLogin) {
+      alert('로그인이 필요합니다.');
+      const selectedEntries = entries.filter(e => selectedIds.has(e.id));
+      navigate('/login', {
+        state: { redirectTo: '/orders', entries: selectedEntries },
+      });
+      return;
+    }
+
+    const selectedEntries = entries.filter(e => selectedIds.has(e.id));
+    navigate('/orders', { state: { entries: selectedEntries } });
   };
+
+  const selectedTotal = entries
+    .filter(e => selectedIds.has(e.id))
+    .reduce((sum, entry) => {
+      const { total } = calculateDinnerPrice(entry.dinner);
+      return sum + total;
+    }, 0);
 
   return (
     <div className="container mx-auto p-4">
@@ -53,10 +94,51 @@ export function Cart() {
         </div>
       ) : (
         <div className="space-y-4">
+          {/* 전체 선택 체크박스 */}
+          <div className="flex items-center justify-between rounded-lg border bg-white p-4">
+            <label className="flex cursor-pointer items-center gap-2">
+              <input
+                type="checkbox"
+                checked={
+                  selectedIds.size === entries.length && entries.length > 0
+                }
+                onChange={handleSelectAll}
+                className="h-5 w-5"
+              />
+              <span className="font-medium">
+                전체 선택 ({selectedIds.size}/{entries.length})
+              </span>
+            </label>
+            {selectedIds.size > 0 && (
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-gray-600">
+                  선택된 항목 총액:{' '}
+                  <span className="text-primary font-semibold">
+                    {formatCurrency(selectedTotal)}
+                  </span>
+                </span>
+                <button
+                  onClick={handleOrder}
+                  className="bg-primary hover:bg-primary/90 rounded px-6 py-2 font-medium text-white"
+                >
+                  선택 항목 주문하기
+                </button>
+              </div>
+            )}
+          </div>
+
           {entries.map(entry => (
             <div key={entry.id} className="rounded-lg border bg-white p-6">
-              <div className="mb-4 flex items-start justify-between">
-                <div>
+              <div className="mb-4 flex items-start gap-4">
+                {/* 체크박스 */}
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(entry.id)}
+                  onChange={() => handleToggleSelect(entry.id)}
+                  className="mt-1 h-5 w-5 cursor-pointer"
+                />
+
+                <div className="flex-1">
                   <h2 className="text-xl font-semibold">
                     {entry.dinner.dinner.name}
                   </h2>
@@ -128,7 +210,7 @@ export function Cart() {
                             <div className="font-medium">{item.item.name}</div>
                             {item.item.base_price_cents !== 0 && (
                               <div className="text-muted-foreground text-xs">
-                                {item.item.base_price_cents.toLocaleString()}원
+                                {formatCurrency(item.item.base_price_cents)}
                               </div>
                             )}
                           </div>
@@ -189,7 +271,7 @@ export function Cart() {
                                       {info.priceDelta !== 0 && (
                                         <span className="ml-1">
                                           ({info.priceDelta > 0 ? '+' : ''}
-                                          {info.priceDelta.toLocaleString()}원)
+                                          {formatCurrency(info.priceDelta)})
                                         </span>
                                       )}
                                     </div>
@@ -210,29 +292,23 @@ export function Cart() {
                   return (
                     <div className="text-right">
                       <div className="text-primary text-xl font-bold">
-                        {total.toLocaleString()}원
+                        {formatCurrency(total)}
                       </div>
                       <div className="text-muted-foreground mt-1 text-xs">
-                        (기본 {basePrice.toLocaleString()}원 / 옵션 + 스타일
-                        반영)
+                        (기본 {formatCurrency(basePrice)} / 옵션 + 스타일 반영)
                       </div>
                     </div>
                   );
                 })()}
-                <div className="mt-3 flex justify-end gap-2">
-                  <button
-                    onClick={() => removeEntry(entry.id)}
-                    className="rounded border px-4 py-2 hover:bg-gray-50"
-                  >
-                    삭제
-                  </button>
-                  <button
-                    onClick={() => handleOrder(entry)}
-                    className="bg-primary hover:bg-primary/90 rounded px-6 py-2 text-white"
-                  >
-                    주문하기
-                  </button>
-                </div>
+              </div>
+
+              <div className="flex justify-end gap-2">
+                <button
+                  onClick={() => removeEntry(entry.id)}
+                  className="rounded border px-4 py-2 hover:bg-gray-50"
+                >
+                  삭제
+                </button>
               </div>
             </div>
           ))}
