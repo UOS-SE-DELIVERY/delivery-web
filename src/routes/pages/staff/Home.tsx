@@ -3,7 +3,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import {
   executeOrderActionAPI,
-  getStaffOrderAPI,
   OrderAction,
   StaffOrderDetailResponse,
 } from '@/api/staff/order/order.api';
@@ -30,9 +29,9 @@ export function Home() {
   const [connectionStatus, setConnectionStatus] = useState<
     'connecting' | 'connected' | 'error'
   >('connecting');
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [selectedOrder, setSelectedOrder] =
     useState<StaffOrderDetailResponse | null>(null);
-  const [detailLoading, setDetailLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [showStatusButtons, setShowStatusButtons] = useState(false);
 
@@ -90,20 +89,10 @@ export function Home() {
     });
   };
 
-  const handleOrderClick = useCallback(async (orderId: number) => {
+  const handleOrderClick = useCallback((orderId: number) => {
     setShowStatusButtons(false);
-    setDetailLoading(true);
-    setSelectedOrder({} as StaffOrderDetailResponse); // 모달 즉시 표시
-    try {
-      const response = await getStaffOrderAPI(orderId);
-      setSelectedOrder(response.data);
-    } catch (err) {
-      console.error('주문 상세 조회 실패:', err);
-      alert('주문 상세 정보를 불러오지 못했습니다.');
-      setSelectedOrder(null);
-    } finally {
-      setDetailLoading(false);
-    }
+    setSelectedOrderId(orderId);
+    setSelectedOrder(null);
   }, []);
 
   const handleStatusClick = useCallback(
@@ -162,6 +151,7 @@ export function Home() {
   );
 
   const closeModal = useCallback(() => {
+    setSelectedOrderId(null);
     setSelectedOrder(null);
     setShowStatusButtons(false);
   }, []);
@@ -326,11 +316,7 @@ export function Home() {
       </div>
 
       {!showStatusButtons && (
-        <OrderModal
-          order={selectedOrder}
-          isLoading={detailLoading}
-          onClose={closeModal}
-        />
+        <OrderModal orderId={selectedOrderId} onClose={closeModal} />
       )}
 
       {/* 주문 상태 변경 버튼 */}
