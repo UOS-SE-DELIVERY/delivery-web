@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 
-import useCartStore from '@/store/cartStore';
+import { useCartStore } from '@/store/cartStore';
 import { DinnerDetail } from '@/types/dinner';
+import { asInt, formatCurrency } from '@/utils/format';
 
 interface DinnerModalProps {
   dinner: DinnerDetail;
@@ -212,7 +213,7 @@ export function DinnerModal({ dinner, onClose }: DinnerModalProps) {
               </p>
             </div>
             <span className="text-primary text-2xl font-bold">
-              {dinner.dinner.base_price_cents.toLocaleString()}원
+              {formatCurrency(dinner.dinner.base_price_cents)}
             </span>
           </div>
 
@@ -233,7 +234,7 @@ export function DinnerModal({ dinner, onClose }: DinnerModalProps) {
                       </div>
                     </div>
                     <div className="text-sm">
-                      {defaultItem.default_qty}개
+                      {asInt(defaultItem.default_qty)}개
                       {defaultItem.included_in_base && (
                         <span className="text-primary ml-2">(기본 포함)</span>
                       )}
@@ -478,7 +479,7 @@ export function DinnerModal({ dinner, onClose }: DinnerModalProps) {
                     {style.price_value !== 0 && (
                       <span className="text-primary">
                         {style.price_mode === 'delta' ? '+' : ''}
-                        {style.price_value.toLocaleString()}원
+                        {formatCurrency(style.price_value)}
                       </span>
                     )}
                   </div>
@@ -510,7 +511,7 @@ export function DinnerModal({ dinner, onClose }: DinnerModalProps) {
             <div className="flex items-center justify-between">
               <span className="text-lg font-semibold">최종 가격</span>
               <span className="text-primary text-2xl font-bold">
-                {(finalPrice * quantity).toLocaleString()}원
+                {formatCurrency(finalPrice * quantity)}
               </span>
             </div>
           </div>
