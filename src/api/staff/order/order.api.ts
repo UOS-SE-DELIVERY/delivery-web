@@ -54,10 +54,12 @@ export interface StaffOrderDinner {
   id: number;
   dinner_type: {
     id: number | null;
+    code: string;
     name: string;
   };
   style: {
     id: number | null;
+    code: string;
     name: string;
   };
   person_label: string | null;
