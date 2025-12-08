@@ -62,8 +62,22 @@ export function RecentOrders() {
 
             const dinnerDetail = dinnerDetailRes.data as DinnerDetail;
 
-            // 디너 옵션 ID를 그대로 사용
-            const dinnerOptions = dinner.options?.map(opt => opt.id) || [];
+            // 디너 옵션: option_name으로 매칭하여 실제 option_id 찾기
+            const dinnerOptions =
+              dinner.options
+                ?.map(opt => {
+                  // option_groups에서 해당 옵션 찾기
+                  for (const group of dinnerDetail.option_groups) {
+                    const matchedOption = group.options.find(
+                      o => o.name === opt.option_name,
+                    );
+                    if (matchedOption) {
+                      return matchedOption.option_id;
+                    }
+                  }
+                  return null;
+                })
+                .filter((id): id is number => id !== null) || [];
 
             // 모든 아이템을 처리
             // 1) 옵션이 있는 아이템: qty와 관계없이 무조건 포함 (qty는 default와의 차이값)
