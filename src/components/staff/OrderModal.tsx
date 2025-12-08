@@ -206,9 +206,9 @@ function OrderModalComponent({ orderId, onClose }: OrderModalProps) {
 
         return {
           dinner: {
-            code: String(dinner.dinner_type.id || ''),
+            code: dinner.dinner_type.code,
             quantity: dinner.quantity,
-            style: String(dinner.style.id || ''),
+            style: dinner.style.code,
             dinner_options: dinner.options?.map(opt => opt.id) || [],
           },
           items: updatedItems,
@@ -217,16 +217,6 @@ function OrderModalComponent({ orderId, onClose }: OrderModalProps) {
 
       // 전체 주문 정보 구성
       await patchOrderAPI(order.id, {
-        receiver_name: order.receiver_name,
-        receiver_phone: order.receiver_phone,
-        delivery_address: order.delivery_address,
-        geo_lat: order.geo_lat,
-        geo_lng: order.geo_lng,
-        place_label: order.place_label,
-        address_meta: order.address_meta,
-        card_last4: order.card_last4,
-        meta: order.meta,
-        coupons: order.coupons?.map(c => ({ code: c.coupon })) || [],
         dinners: updatedDinners,
       });
 
