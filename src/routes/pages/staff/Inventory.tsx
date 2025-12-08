@@ -168,9 +168,9 @@ export function Inventory() {
                   <td className="px-6 py-4 text-center">
                     <span
                       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                        item.qty > 10
+                        item.qty >= 20
                           ? 'bg-blue-100 text-blue-800'
-                          : item.qty > 5
+                          : item.qty >= 10
                             ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-red-100 text-red-800'
                       }`}
