@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router';
 import { getAuthMeAPI } from '@/api/auth/me/me.api';
 import { postOrderAPI } from '@/api/order/order.api';
 import { useAuthStore } from '@/store/authStore';
-import type { OrderRequest } from '@/types/order';
+import type { OrderItem, OrderRequest } from '@/types/order';
 import type { Profile, ProfileAddress } from '@/types/profile';
 
 // Web Speech API 타입 선언
@@ -92,6 +92,8 @@ export function ChatbotOrder() {
   const [errorText, setErrorText] = useState<string | null>(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const requestAbortRef = useRef<AbortController | null>(null);
+  const [ttsEnabled, setTtsEnabled] = useState(true);
+  const [ttsSupported, setTtsSupported] = useState(false);
 
   // 스크롤을 맨 아래로 이동
   const scrollToBottom = useCallback(() => {
@@ -117,6 +119,9 @@ export function ChatbotOrder() {
         }
       ).webkitSpeechRecognition;
     setSpeechSupported(!!SR);
+
+    // TTS 지원 여부 확인
+    setTtsSupported('speechSynthesis' in window);
   }, []);
 
   // 사용자 정보 가져오기
@@ -134,6 +139,25 @@ export function ChatbotOrder() {
     };
     fetchUserInfo();
   }, []);
+
+  // TTS로 텍스트 읽기
+  const speakText = useCallback(
+    (text: string) => {
+      if (!ttsEnabled || !ttsSupported) return;
+
+      // 이미 말하고 있으면 중지
+      window.speechSynthesis.cancel();
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ko-KR';
+      utterance.rate = 1.5; // 1.0 → 1.5으로 속도 증가 (50% 빠름)
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      window.speechSynthesis.speak(utterance);
+    },
+    [ttsEnabled, ttsSupported],
+  );
 
   const sendMessage = useCallback(
     async (textToSend: string) => {
@@ -181,21 +205,39 @@ export function ChatbotOrder() {
 
         setMessages(prev => [...prev, botMessage]);
 
+        // TTS로 봇 응답 읽기
+        speakText(response.data.reply);
+
         // 주문이 완료되면 서버 주문 생성 진행
         if (response.data.finished) {
           const state = response.data.order_state as any;
-          // order_state에서 dinner code/style만 사용
+          // order_state에서 dinner code/style/items 추출
           let dinnerCode = '';
           let dinnerStyle = '';
+          let dinnerQuantity = '1';
+          let items: OrderItem[] = [];
+
           if (state?.dinner?.code && state?.dinner?.style) {
             dinnerCode = String(state.dinner.code);
             dinnerStyle = String(state.dinner.style);
+            dinnerQuantity = String(state.dinner.quantity || '1');
           } else if (
             Array.isArray(state?.dinners) &&
             state.dinners[0]?.dinner
           ) {
-            dinnerCode = String(state.dinners[0].dinner.code || '');
-            dinnerStyle = String(state.dinners[0].dinner.style || '');
+            const firstDinner = state.dinners[0];
+            dinnerCode = String(firstDinner.dinner.code || '');
+            dinnerStyle = String(firstDinner.dinner.style || '');
+            dinnerQuantity = String(firstDinner.dinner.quantity || '1');
+
+            // items 추출 및 변환 (추가 아이템)
+            if (Array.isArray(firstDinner.items)) {
+              items = firstDinner.items.map((item: any) => ({
+                code: String(item.code || ''),
+                qty: String(item.qty || '0'),
+                options: item.options || [],
+              }));
+            }
           }
 
           // 사용자 프로필 정보로 수신자/주소 채우기
@@ -213,11 +255,12 @@ export function ChatbotOrder() {
             fulfillment_type: 'DELIVERY',
             dinner: {
               code: dinnerCode,
-              quantity: '1',
+              quantity: dinnerQuantity,
               style: dinnerStyle,
               dinner_options: [],
               default_overrides: [],
             },
+            items: items.length > 0 ? items : undefined,
             receiver_name: me?.real_name ?? '',
             receiver_phone: me?.phone ?? '',
             delivery_address: addr?.line ?? '',
@@ -394,24 +437,31 @@ export function ChatbotOrder() {
   useEffect(() => {
     if (!isOpen) {
       stopListening();
+      // TTS 중지
+      if (ttsSupported) {
+        window.speechSynthesis.cancel();
+      }
       // 열려있던 네트워크 요청이 있으면 취소
       if (requestAbortRef.current) {
         requestAbortRef.current.abort();
         requestAbortRef.current = null;
       }
     }
-  }, [isOpen, stopListening]);
+  }, [isOpen, stopListening, ttsSupported]);
 
   // 언마운트 시 정리
   useEffect(() => {
     return () => {
       stopListening();
+      if (ttsSupported) {
+        window.speechSynthesis.cancel();
+      }
       if (requestAbortRef.current) {
         requestAbortRef.current.abort();
         requestAbortRef.current = null;
       }
     };
-  }, [stopListening]);
+  }, [stopListening, ttsSupported]);
 
   const handleKeyPress = useCallback(
     (e: React.KeyboardEvent) => {
@@ -497,16 +547,32 @@ export function ChatbotOrder() {
               <MessageCircle className="h-5 w-5" />
               <h3 className="font-semibold">챗봇 주문</h3>
             </div>
-            <button
-              onClick={() => {
-                if (isRecognizing) stopListening();
-                setIsOpen(false);
-              }}
-              className="hover:bg-primary/80 rounded p-1 transition-colors"
-              aria-label="닫기"
-            >
-              <X className="h-5 w-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              {ttsSupported && (
+                <button
+                  onClick={() => setTtsEnabled(!ttsEnabled)}
+                  className={`rounded px-2 py-1 text-xs transition-colors ${
+                    ttsEnabled
+                      ? 'bg-white/20 hover:bg-white/30'
+                      : 'bg-white/10 hover:bg-white/20'
+                  }`}
+                  aria-label="TTS 토글"
+                >
+                  {ttsEnabled ? '🔊 TTS ON' : '🔇 TTS OFF'}
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  if (isRecognizing) stopListening();
+                  if (ttsSupported) window.speechSynthesis.cancel();
+                  setIsOpen(false);
+                }}
+                className="hover:bg-primary/80 rounded p-1 transition-colors"
+                aria-label="닫기"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
           </div>
 
           {/* 메시지 목록 */}
